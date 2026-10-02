@@ -1,29 +1,29 @@
 package com.inventory.domain.port.out;
 
+import java.util.List;
+
 /**
- * Output port — AI analytics abstraction.
+ * Puerto de salida — Abstracción de analíticas con IA.
  *
- * Implementations live in infrastructure/adapter/out/ai/.
- * The domain never knows which AI provider is active.
- *
- * To add a new provider: implement this interface and activate
- * the corresponding Spring profile.
+ * Las implementaciones viven en infrastructure/ai/.
+ * El dominio nunca conoce qué proveedor de IA está activo.
  */
 public interface AiAnalyticsPort {
 
     /**
-     * Generates a natural-language summary of the provided sales data.
+     * Genera un resumen en lenguaje natural o responde a una pregunta sobre los datos de ventas.
      *
-     * @param salesDataJson  JSON-serialized sales metrics to be summarized.
-     * @return               Human-readable summary text.
+     * @param metricsDataJson JSON con las métricas a analizar.
+     * @param userPrompt      Pregunta o instrucción opcional del usuario. Si es nulo, genera un resumen general.
+     * @return                Texto legible con la respuesta de la IA.
      */
-    String generateSalesSummary(String salesDataJson);
+    String analyzeMetrics(String metricsDataJson, String userPrompt);
 
     /**
-     * Generates actionable insights for the given product list.
+     * Genera insights accionables para una lista de productos.
      *
-     * @param productsJson  JSON-serialized list of products.
-     * @return              List of insight strings.
+     * @param productsJson JSON con la lista de productos.
+     * @return             Lista de cadenas de texto con insights.
      */
-    java.util.List<String> generateProductInsights(String productsJson);
+    List<String> generateProductInsights(String productsJson);
 }

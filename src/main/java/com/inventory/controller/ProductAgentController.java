@@ -24,58 +24,48 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 /**
- * REST controller for the AI-powered product agent endpoint.
+ * Controlador para el endpoint del agente de productos con IA.
  *
- * Multi-turn conversation flow:
- *   1. POST /api/products/agent — initial request (instruction + optional file)
- *      Response: { sessionId, status: "AWAITING_INPUT", question, missingFields }
- *   2. POST /api/products/agent — follow-up (sessionId + instruction with missing data)
- *      Response: { sessionId, status: "COMPLETE", savedProductId }
+ * Flujo de conversación:
+ * 1. POST /api/products/agent — peticion inicial (instruccion + archivo
+ * opcional)
+ * Respuesta: { sessionId, status: "AWAITING_INPUT", question, missingFields }
+ * 2. POST /api/products/agent — seguimiento (sessionId + instruccion con datos
+ * faltantes)
+ * Respuesta: { sessionId, status: "COMPLETE", savedProductId }
  */
 @Slf4j
 @Validated
 @RestController
 @RequestMapping("/api/products/agent")
 @RequiredArgsConstructor
-@Tag(name = "Product Agent", description = "AI-powered product creation and update via natural language")
+@Tag(name = "Product Agent", description = "AI-powered crea o actualiza productos via agente")
 public class ProductAgentController {
 
     private static final long MAX_FILE_SIZE_BYTES = 20 * 1024 * 1024; // 20 MB
 
     private final ManageProductPort manageProductPort;
 
-    @Operation(
-        summary = "Process a product instruction via AI agent",
-        description = "Accepts a natural-language instruction and an optional file (PDF, image, CSV, TXT). "
-            + "Returns COMPLETE (200) when all fields are found, or AWAITING_INPUT (202) when more info is needed. "
-            + "Use the returned sessionId in follow-up requests."
-    )
+    @Operation(summary = "Procesar instrucción de producto vía agente de IA", description = "Acepta una instrucción en lenguaje natural y un archivo opcional (PDF, imagen, CSV, TXT). "
+            + "Retorna COMPLETE (200) cuando todos los campos son encontrados, o AWAITING_INPUT (202) cuando se necesita más información. "
+            + "Usa el sessionId devuelto en las peticiones de seguimiento.")
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "COMPLETE — product saved",
-            content = @Content(schema = @Schema(implementation = AgentResponseDto.class))),
-        @ApiResponse(responseCode = "202", description = "AWAITING_INPUT — more information needed"),
-        @ApiResponse(responseCode = "400", description = "Invalid request"),
-        @ApiResponse(responseCode = "413", description = "File exceeds 20 MB"),
-        @ApiResponse(responseCode = "422", description = "FAILED — all agent levels exhausted"),
-        @ApiResponse(responseCode = "403", description = "Insufficient role (ADMIN required)")
+            @ApiResponse(responseCode = "200", description = "COMPLETE — producto guardado", content = @Content(schema = @Schema(implementation = AgentResponseDto.class))),
+            @ApiResponse(responseCode = "202", description = "AWAITING_INPUT — se necesita más información"),
+            @ApiResponse(responseCode = "400", description = "Petición inválida"),
+            @ApiResponse(responseCode = "413", description = "El archivo excede los 20 MB"),
+            @ApiResponse(responseCode = "422", description = "FAILED — todos los niveles de agente fallaron"),
+            @ApiResponse(responseCode = "403", description = "Rol insuficiente (se requiere ADMIN)")
     })
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<AgentResponseDto> processInstruction(
 
-            @Parameter(description = "Existing session ID (required for follow-up turns)")
-            @RequestPart(value = "sessionId", required = false)
-            String sessionId,
+            @Parameter(description = "ID de sesión existente (requerido para turnos de seguimiento)") @RequestPart(value = "sessionId", required = false) String sessionId,
 
-            @Parameter(description = "Natural-language instruction (required)", required = true)
-            @RequestPart("instruction")
-            @NotBlank(message = "instruction must not be blank")
-            @Size(max = 4000)
-            String instruction,
+            @Parameter(description = "Instrucción en lenguaje natural (requerida)", required = true) @RequestPart("instruction") @NotBlank(message = "instruction must not be blank") @Size(max = 4000) String instruction,
 
-            @Parameter(description = "Optional file: PDF catalog, product image, CSV or plain text")
-            @RequestPart(value = "file", required = false)
-            MultipartFile file
+            @Parameter(description = "Archivo opcional: catálogo PDF, imagen de producto, CSV o texto plano") @RequestPart(value = "file", required = false) MultipartFile file
 
     ) throws IOException {
 
@@ -87,18 +77,18 @@ public class ProductAgentController {
             return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).build();
         }
 
-        String filename    = (file != null && !file.isEmpty()) ? file.getOriginalFilename() : null;
+        String filename = (file != null && !file.isEmpty()) ? file.getOriginalFilename() : null;
         byte[] fileContent = (file != null && !file.isEmpty()) ? file.getBytes() : null;
 
-        ManageProductPort.AgentUseCaseResult result =
-                manageProductPort.process(sessionId, instruction, filename, fileContent);
+        ManageProductPort.AgentUseCaseResult result = manageProductPort.process(sessionId, instruction, filename,
+                fileContent);
 
         AgentResponseDto response = AgentResponseDto.from(result);
 
         return switch (result.extraction().status()) {
-            case COMPLETE       -> ResponseEntity.ok(response);
+            case COMPLETE -> ResponseEntity.ok(response);
             case AWAITING_INPUT -> ResponseEntity.accepted().body(response);
-            case FAILED         -> ResponseEntity.unprocessableEntity().body(response);
+            case FAILED -> ResponseEntity.unprocessableEntity().body(response);
         };
     }
 

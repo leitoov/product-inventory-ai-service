@@ -37,34 +37,34 @@ public class ProductAgentAdapter implements ProductAgentPort {
     // System prompt — provider-agnostic, structured output enforced
     // =========================================================================
     private static final String SYSTEM_PROMPT = """
-            You are a product data extraction agent. Your ONLY function is to extract
-            product information from the user's instruction and any provided document context.
+            Eres un agente de extracción de datos de productos. Tu ÚNICA función es extraer
+            información del producto a partir de las instrucciones del usuario y cualquier contexto provisto.
             
-            Required fields: sku, name, price (numeric), stock (integer)
-            Optional fields: description, imageUrl
+            Campos requeridos: sku, name, price (numérico), stock (entero)
+            Campos opcionales: description, imageUrl
             
-            Rules:
-            - Detect whether the user wants to CREATE a new product or UPDATE an existing one.
-            - If ALL required fields are present, respond with status "COMPLETE".
-            - If any required field is missing, respond with status "AWAITING_INPUT" and
-              include a concise question asking only for the missing fields.
-            - NEVER invent or guess data. If a field is not found, set it to null.
-            - Respond ONLY with valid JSON. No markdown fences, no extra text.
+            Reglas:
+            - Detecta si el usuario quiere CREAR (CREATE) un nuevo producto o ACTUALIZAR (UPDATE) uno existente.
+            - Si TODOS los campos requeridos están presentes, responde con status "COMPLETE".
+            - Si falta algún campo requerido, responde con status "AWAITING_INPUT" e
+              incluye una pregunta concisa (en español) pidiendo solo la información que falta.
+            - NUNCA inventes o adivines datos. Si no encuentras un campo, déjalo como null.
+            - Responde ÚNICAMENTE con un JSON válido. Sin comillas invertidas, sin markdown, sin texto extra.
             
-            Response format (strict):
+            Formato de respuesta (estricto):
             {
               "status": "COMPLETE" | "AWAITING_INPUT",
               "operation": "CREATE" | "UPDATE",
               "product": {
-                "sku":         "string or null",
-                "name":        "string or null",
-                "description": "string or null",
-                "imageUrl":    "string or null",
-                "price":       number_or_null,
-                "stock":       integer_or_null
+                "sku":         "string o null",
+                "name":        "string o null",
+                "description": "string o null",
+                "imageUrl":    "string o null",
+                "price":       numero_o_null,
+                "stock":       entero_o_null
               },
-              "missingFields": ["field1", "field2"],
-              "question":     "string or null",
+              "missingFields": ["campo1", "campo2"],
+              "question":     "string o null",
               "confidence":   0.95
             }
             """;
@@ -84,8 +84,8 @@ public class ProductAgentAdapter implements ProductAgentPort {
 
         List<AgentLevelConfig> levels = agentsProperties.levels();
         if (levels == null || levels.isEmpty()) {
-            log.error("No agent levels configured in ai.agents.levels");
-            return ExtractionResult.failed("No agent levels configured.");
+            log.error("No hay niveles de agente configurados en ai.agents.levels");
+            return ExtractionResult.failed("No hay niveles de agente configurados.");
         }
 
         List<String> failures = new ArrayList<>();
@@ -129,7 +129,7 @@ public class ProductAgentAdapter implements ProductAgentPort {
         }
 
         // All levels exhausted
-        String summary = "All agent levels exhausted. Failures:\n" + String.join("\n", failures);
+        String summary = "Todos los niveles de agente fallaron. Errores:\n" + String.join("\n", failures);
         log.error(summary);
         return ExtractionResult.failed(summary);
     }
@@ -214,9 +214,9 @@ public class ProductAgentAdapter implements ProductAgentPort {
                 List<String> stillMissing = ExtractionResult.detectMissingRequired(sku, name, price, stock);
                 if (!stillMissing.isEmpty()) {
                     // Model said COMPLETE but fields are actually missing — treat as AWAITING_INPUT
-                    log.warn("[{}] Model returned COMPLETE but fields {} are null. Downgrading to AWAITING_INPUT.",
+                    log.warn("[{}] El modelo retornó COMPLETE pero los campos {} son nulos. Degradando a AWAITING_INPUT.",
                             agentLevel, stillMissing);
-                    String autoQuestion = "Could you provide the following missing information? "
+                    String autoQuestion = "¿Podrías proporcionar la siguiente información faltante? "
                                          + String.join(", ", stillMissing);
                     return ExtractionResult.awaitingInput(operation, sku, name, description, imageUrl,
                             price, stock, stillMissing, autoQuestion, confidence * 0.5, agentLevel, raw);
@@ -234,8 +234,8 @@ public class ProductAgentAdapter implements ProductAgentPort {
                     price, stock, missingFields, question, confidence, agentLevel, raw);
 
         } catch (Exception e) {
-            log.error("Failed to parse agent response from [{}]: {}", agentLevel, e.getMessage());
-            throw new AgentCallException(agentLevel, "Invalid JSON response: " + e.getMessage());
+            log.error("Fallo al parsear respuesta del agente [{}]: {}", agentLevel, e.getMessage());
+            throw new AgentCallException(agentLevel, "Respuesta JSON inválida: " + e.getMessage());
         }
     }
 

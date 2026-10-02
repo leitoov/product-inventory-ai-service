@@ -71,7 +71,7 @@ public class ProductAgentService implements ManageProductPort {
         log.info("Agent [{}] returned status={} confidence={} missingFields={}",
                 result.agentLevel(), result.status(), result.confidence(), result.missingFields());
 
-        // 4. Merge partial data into the session regardless of status
+        // 4. Integrar datos parciales en la sesión sin importar el estado
         session.mergePartialData(result);
 
         if (result.needsMoreInfo()) {
@@ -87,8 +87,8 @@ public class ProductAgentService implements ManageProductPort {
             return new AgentUseCaseResult(session.getSessionId(), result, savedId);
         }
 
-        // FAILED — keep session alive so user can retry
-        session.addAgentMessage("I was unable to process your request. Please try rephrasing.");
+        // FAILED — mantenemos la sesión viva para que el usuario pueda reintentar
+        session.addAgentMessage("No pude procesar tu solicitud. Por favor, intenta reformularla.");
         saveSession(session);
         return new AgentUseCaseResult(session.getSessionId(), result, null);
     }

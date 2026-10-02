@@ -4,10 +4,10 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 /**
- * Request DTO for the product agent endpoint.
+ * DTO de petición para el endpoint del agente de productos.
  *
- * @param sessionId   Optional. Existing session ID for multi-turn conversations.
- * @param instruction Required. Natural-language instruction from the user.
+ * @param sessionId   Opcional. ID de sesión existente para conversaciones multi-turno.
+ * @param instruction Requerido. Instrucción en lenguaje natural del usuario.
  */
 public record AgentRequestDto(
         String sessionId,

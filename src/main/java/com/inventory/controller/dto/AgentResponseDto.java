@@ -8,17 +8,17 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Response DTO for the product agent endpoint.
+ * DTO de respuesta para el endpoint del agente de productos.
  *
- * @param sessionId       Use this ID in the next request if status is AWAITING_INPUT.
+ * @param sessionId       Usa este ID en la próxima petición si el estado es AWAITING_INPUT.
  * @param status          COMPLETE | AWAITING_INPUT | FAILED
- * @param operation       CREATE or UPDATE (when detected)
- * @param product         Extracted product data (partially or fully filled)
- * @param missingFields   Required fields still missing (when AWAITING_INPUT)
- * @param question        Question to show the user (when AWAITING_INPUT)
- * @param savedProductId  The persisted product ID (only when COMPLETE)
- * @param agentLevel      Which agent level produced this result (L1, L2, L3)
- * @param confidence      Agent's confidence score [0.0, 1.0]
+ * @param operation       CREATE o UPDATE (cuando es detectado)
+ * @param product         Datos extraídos del producto (parcial o totalmente llenos)
+ * @param missingFields   Campos requeridos aún faltantes (cuando es AWAITING_INPUT)
+ * @param question        Pregunta a mostrar al usuario (cuando es AWAITING_INPUT)
+ * @param savedProductId  ID del producto persistido (solo cuando es COMPLETE)
+ * @param agentLevel      Nivel de agente que produjo este resultado (L1, L2, L3)
+ * @param confidence      Puntaje de confianza del agente [0.0, 1.0]
  */
 public record AgentResponseDto(
         String sessionId,
