@@ -49,17 +49,10 @@ Este servicio backend expone una API REST que permite:
 
 ## Arquitectura
 
-### ¿Capas o Hexagonal?
+### Hexagonal
+Arquitectura Hexagonal (Ports & Adapters)
 
-| Criterio | Arquitectura en Capas | Arquitectura Hexagonal (Ports & Adapters) |
-| :--- | :--- | :--- |
-| Complejidad inicial | Baja — estructura familiar para cualquier equipo Spring | Media — requiere definir puertos e interfaces desde el día 1 |
-| Testabilidad | Buena si se usan interfaces en el Service | Excelente — el dominio queda 100 % aislado |
-| Flexibilidad ante cambios externos (proveedor de IA, BD) | Depende del diseño; puede acoplarse | Muy alta — los adaptadores son intercambiables por diseño |
-| Escalabilidad del proyecto | Suficiente para proyectos medianos | Recomendada si se prevé crecimiento o múltiples integraciones |
-| **Decisión propuesta** | | **Hexagonal** dado que el proveedor de IA es intercambiable |
-
-> **Justificación**: dado que el proveedor de IA debe poder cambiarse sin tocar el dominio y que habrá múltiples adaptadores (REST, base de datos, IA, autenticación).
+**Justificación**: dado que el proveedor de IA debe poder cambiarse sin tocar el dominio y que habrá múltiples adaptadores (REST, base de datos, IA, autenticación).
 
 ### Estructura de Paquetes (Hexagonal)
 
