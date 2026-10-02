@@ -39,7 +39,7 @@ public class SalesAgentService {
         session.addUserMessage(instruction);
 
         // 1. Cargar el catálogo actual (simplificado a todos los productos con stock > 0)
-        List<Product> catalog = productRepository.findAll(0, 500).products().stream()
+        List<Product> catalog = productRepository.findAll().stream()
                 .filter(p -> p.stock() != null && p.stock() > 0)
                 .toList();
         

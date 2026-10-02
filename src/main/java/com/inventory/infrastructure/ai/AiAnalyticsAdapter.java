@@ -3,6 +3,7 @@ package com.inventory.infrastructure.ai;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.inventory.domain.port.out.AiAnalyticsPort;
+import com.inventory.infrastructure.config.AgentLevelConfig;
 import com.inventory.infrastructure.config.AgentsProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,15 +45,21 @@ public class AiAnalyticsAdapter implements AiAnalyticsPort {
         );
 
         // Usar L2 por defecto para métricas para buen balance entre velocidad y razonamiento
-        AgentsProperties.AgentLevel level = agentsProperties.levels().get("L2");
+        AgentLevelConfig level = agentsProperties.levels().stream()
+                .filter(l -> l.name().equals("L2"))
+                .findFirst()
+                .orElse(null);
         if (level == null) {
             log.warn("Nivel L2 no configurado, intentando L1");
-            level = agentsProperties.levels().get("L1");
+            level = agentsProperties.levels().stream()
+                    .filter(l -> l.name().equals("L1"))
+                    .findFirst()
+                    .orElse(null);
         }
 
         try {
-            HttpAiClient.AiResponse response = aiClient.chatCompletion(messages, level);
-            return response.content();
+            String response = aiClient.chatCompletion(level, messages);
+            return response;
         } catch (Exception e) {
             log.error("Error al comunicarse con la IA para métricas: {}", e.getMessage());
             return "No se pudo generar el análisis en este momento debido a un error de conexión con la IA.";

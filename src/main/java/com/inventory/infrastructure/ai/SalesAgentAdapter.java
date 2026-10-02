@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.inventory.domain.model.SalesAgentResult;
 import com.inventory.domain.model.SalesSession;
 import com.inventory.domain.port.out.SalesAgentPort;
+import com.inventory.infrastructure.config.AgentLevelConfig;
 import com.inventory.infrastructure.config.AgentsProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -59,14 +60,20 @@ public class SalesAgentAdapter implements SalesAgentPort {
         );
 
         // Usar L2 por defecto para agente de ventas
-        AgentsProperties.AgentLevel level = agentsProperties.levels().get("L2");
+        AgentLevelConfig level = agentsProperties.levels().stream()
+                .filter(l -> l.name().equals("L2"))
+                .findFirst()
+                .orElse(null);
         if (level == null) {
-            level = agentsProperties.levels().get("L1");
+            level = agentsProperties.levels().stream()
+                    .filter(l -> l.name().equals("L1"))
+                    .findFirst()
+                    .orElse(null);
         }
 
         try {
-            HttpAiClient.AiResponse response = aiClient.chatCompletion(messages, level);
-            return parseResponse(response.content());
+            String response = aiClient.chatCompletion(level, messages);
+            return parseResponse(response);
         } catch (Exception e) {
             log.error("Fallo al comunicarse con el agente de ventas: {}", e.getMessage());
             throw new AgentCallException(level.name(), "Fallo al procesar chat de ventas: " + e.getMessage());

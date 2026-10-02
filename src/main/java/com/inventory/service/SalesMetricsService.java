@@ -29,7 +29,7 @@ public class SalesMetricsService implements SalesMetricsPort {
 
         // Al no tener aún entidad de 'Ventas', calculamos métricas basadas en el inventario actual
         // como un placeholder para el dashboard.
-        List<Product> allProducts = productRepository.findAll(0, 1000).products(); // Simulamos traer todo
+        List<Product> allProducts = productRepository.findAll(); // Simulamos traer todo
 
         long totalProducts = allProducts.size();
         long totalStock = allProducts.stream().mapToLong(p -> p.stock() != null ? p.stock() : 0).sum();

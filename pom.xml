@@ -126,8 +126,12 @@
             <artifactId>postgresql</artifactId>
             <scope>test</scope>
         </dependency>
-
-        <!-- ===== PDF Text Extraction (RAG) ===== -->
+        <!-- ===== H2 In-Memory DB for Tests (Docker Alternative) ===== -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.apache.pdfbox</groupId>
             <artifactId>pdfbox</artifactId>

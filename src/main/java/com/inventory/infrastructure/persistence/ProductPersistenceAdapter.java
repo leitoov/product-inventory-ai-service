@@ -28,6 +28,13 @@ public class ProductPersistenceAdapter implements ProductRepositoryPort {
     }
 
     @Override
+    public java.util.List<Product> findAll() {
+        return jpaRepository.findAll().stream()
+                .map(mapper::toDomain)
+                .toList();
+    }
+
+    @Override
     public Optional<Product> findById(UUID id) {
         return jpaRepository.findById(id).map(mapper::toDomain);
     }

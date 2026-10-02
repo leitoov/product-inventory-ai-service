@@ -9,6 +9,7 @@ import com.inventory.infrastructure.config.AiProviderProperties;
 import com.inventory.infrastructure.config.RagProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.springframework.stereotype.Component;
@@ -123,7 +124,7 @@ public class DocumentProcessorAdapter implements DocumentProcessorPort {
     }
 
     private String extractPdf(byte[] content) throws Exception {
-        try (PDDocument doc = PDDocument.load(new ByteArrayInputStream(content))) {
+        try (PDDocument doc = Loader.loadPDF(content)) {
             PDFTextStripper stripper = new PDFTextStripper();
             return stripper.getText(doc);
         }

@@ -13,6 +13,8 @@ public interface ProductRepositoryPort {
 
     Product save(Product product);
 
+    java.util.List<Product> findAll();
+
     Optional<Product> findById(UUID id);
 
     Optional<Product> findBySku(String sku);
