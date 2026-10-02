@@ -37,13 +37,58 @@ jwt:
   refresh-expiration-ms: ${JWT_REFRESH_EXPIRATION_MS:604800000}  # 7 días
 
 # =============================================
-# AI Provider (proveedor agnóstico)
+# AI Provider (proveedor agnóstico — base)
 # =============================================
 ai:
   provider:
     endpoint: ${AI_PROVIDER_ENDPOINT:}
     api-key: ${AI_PROVIDER_API_KEY:}
     model: ${AI_PROVIDER_MODEL:}
+
+  # =============================================
+  # Agent Levels — escalation: L1 → L2 → L3
+  # Each level can override endpoint/key/model.
+  # Falls back to ai.provider values if not set.
+  # =============================================
+  agents:
+    levels:
+      - name: L1
+        endpoint: ${AI_AGENT_L1_ENDPOINT:${AI_PROVIDER_ENDPOINT:}}
+        api-key: ${AI_AGENT_L1_API_KEY:${AI_PROVIDER_API_KEY:}}
+        model: ${AI_AGENT_L1_MODEL:${AI_PROVIDER_MODEL:}}
+        timeout-ms: 8000
+        min-confidence: 0.75
+        max-retries: 1
+      - name: L2
+        endpoint: ${AI_AGENT_L2_ENDPOINT:${AI_PROVIDER_ENDPOINT:}}
+        api-key: ${AI_AGENT_L2_API_KEY:${AI_PROVIDER_API_KEY:}}
+        model: ${AI_AGENT_L2_MODEL:${AI_PROVIDER_MODEL:}}
+        timeout-ms: 20000
+        min-confidence: 0.60
+        max-retries: 2
+      - name: L3
+        endpoint: ${AI_AGENT_L3_ENDPOINT:${AI_PROVIDER_ENDPOINT:}}
+        api-key: ${AI_AGENT_L3_API_KEY:${AI_PROVIDER_API_KEY:}}
+        model: ${AI_AGENT_L3_MODEL:${AI_PROVIDER_MODEL:}}
+        timeout-ms: 60000
+        min-confidence: 0.0   # L3 is last resort — accept any result
+        max-retries: 3
+
+# =============================================
+# RAG — Document processing
+# =============================================
+rag:
+  chunk-size: 512          # characters per chunk
+  chunk-overlap: 64        # overlap between chunks
+  top-k-results: 5         # number of chunks to retrieve per query
+
+# =============================================
+# Agent Session (Caffeine in-memory cache)
+# =============================================
+agent:
+  session:
+    ttl-minutes: 30        # session expires after 30 min of inactivity
+    max-sessions: 1000
 
 # =============================================
 # Image Storage
