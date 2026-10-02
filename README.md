@@ -57,9 +57,9 @@ Este servicio backend expone una API REST que permite:
 | Testabilidad | Buena si se usan interfaces en el Service | Excelente — el dominio queda 100 % aislado |
 | Flexibilidad ante cambios externos (proveedor de IA, BD) | Depende del diseño; puede acoplarse | Muy alta — los adaptadores son intercambiables por diseño |
 | Escalabilidad del proyecto | Suficiente para proyectos medianos | Recomendada si se prevé crecimiento o múltiples integraciones |
-| **Decisión propuesta** | | ✅ **Hexagonal** ← ideal dado que el proveedor de IA es intercambiable |
+| **Decisión propuesta** | | **Hexagonal** dado que el proveedor de IA es intercambiable |
 
-> **Justificación**: dado que el proveedor de IA debe poder cambiarse sin tocar el dominio y que habrá múltiples adaptadores (REST, base de datos, IA, autenticación), la **arquitectura hexagonal** encaja mejor. El dominio nunca depende de frameworks ni de proveedores externos.
+> **Justificación**: dado que el proveedor de IA debe poder cambiarse sin tocar el dominio y que habrá múltiples adaptadores (REST, base de datos, IA, autenticación).
 
 ### Estructura de Paquetes (Hexagonal)
 
@@ -187,7 +187,7 @@ El adaptador concreto se selecciona por configuración (`application.yml`) sin c
 ### Requisitos Previos
 
 - JDK 21
-- Docker (recomendado para PostgreSQL) o PostgreSQL instalado localmente
+- Docker o PostgreSQL instalado localmente
 - Maven 3.9+
 
 ### Variables de Entorno
@@ -205,7 +205,7 @@ Crear un archivo `.env` en la raíz o configurar en `application.yml`:
 | `AI_PROVIDER_ENDPOINT` | URL base del proveedor de IA | `https://api.example.com/v1` |
 | `AI_PROVIDER_API_KEY` | API Key del proveedor de IA | — |
 | `AI_PROVIDER_MODEL` | Modelo a utilizar | `model-name` |
-| `IMAGE_STORAGE_PATH` | Ruta local para imágenes (si no se usa cloud) | `./uploads` |
+| `IMAGE_STORAGE_PATH` | Ruta local para imágenes | `./uploads` |
 
 ---
 
@@ -236,19 +236,3 @@ open http://localhost:8080/swagger-ui.html
 
 ---
 
-## Roadmap
-
-- [x] Definición de arquitectura y modelo de datos
-- [ ] Configuración base de Spring Boot + Security + JPA
-- [ ] Implementación de autenticación JWT
-- [ ] CRUD de productos con validaciones
-- [ ] Subida y gestión de imágenes
-- [ ] Módulo de métricas de ventas
-- [ ] Adaptador de IA (puerto genérico + primera implementación)
-- [ ] Pruebas unitarias e integración (JUnit 5 + Testcontainers)
-- [ ] Dockerización del servicio completo (`docker-compose`)
-- [ ] CI/CD pipeline básico
-
----
-
-> **Nota de arquitectura**: este README es un documento vivo. A medida que el proyecto evolucione, las decisiones de diseño aquí documentadas se actualizarán para reflejar el estado real del código.
