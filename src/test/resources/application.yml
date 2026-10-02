@@ -1,0 +1,14 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop    # Recrea el esquema en cada arranque durante tests
+    show-sql: true
+
+  datasource:
+    url: jdbc:tc:postgresql:16:///inventory_test_db
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+
+logging:
+  level:
+    com.inventory: DEBUG
+    org.hibernate.SQL: DEBUG

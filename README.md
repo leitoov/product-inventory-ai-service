@@ -16,7 +16,6 @@ API REST para la gestión integral de catálogo de productos, control de inventa
 - [Endpoints Principales](#endpoints-principales)
 - [Configuración y Entorno](#configuración-y-entorno)
 - [Ejecución Local](#ejecución-local)
-- [Roadmap](#roadmap)
 
 ---
 

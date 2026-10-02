@@ -1,0 +1,76 @@
+server:
+  port: ${SERVER_PORT:8080}
+
+spring:
+  application:
+    name: product-inventory-ai-service
+
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/inventory_db}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate        # En producción usar 'validate'; para desarrollo usar 'update'
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    open-in-view: false
+
+  mvc:
+    throw-exception-if-no-handler-found: true
+
+  web:
+    resources:
+      add-mappings: false
+
+# =============================================
+# JWT
+# =============================================
+jwt:
+  secret: ${JWT_SECRET:change-this-secret-key-in-production-must-be-at-least-256-bits}
+  expiration-ms: ${JWT_EXPIRATION_MS:3600000}         # 1 hora
+  refresh-expiration-ms: ${JWT_REFRESH_EXPIRATION_MS:604800000}  # 7 días
+
+# =============================================
+# AI Provider (proveedor agnóstico)
+# =============================================
+ai:
+  provider:
+    endpoint: ${AI_PROVIDER_ENDPOINT:}
+    api-key: ${AI_PROVIDER_API_KEY:}
+    model: ${AI_PROVIDER_MODEL:}
+
+# =============================================
+# Image Storage
+# =============================================
+storage:
+  image-path: ${IMAGE_STORAGE_PATH:./uploads}
+
+# =============================================
+# Springdoc / Swagger
+# =============================================
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+    tags-sorter: alpha
+  info:
+    title: Product Inventory & Analytics API
+    description: API REST para gestión de productos, catálogo y métricas de ventas con IA
+    version: 1.0.0
+
+# =============================================
+# Logging
+# =============================================
+logging:
+  level:
+    com.inventory: DEBUG
+    org.springframework.security: INFO
+    org.hibernate.SQL: INFO

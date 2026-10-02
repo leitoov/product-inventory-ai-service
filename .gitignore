@@ -1,0 +1,32 @@
+# Compiled class files
+target/
+*.class
+
+# Maven wrapper cache
+.mvn/wrapper/maven-wrapper.jar
+
+# Environment files — NEVER commit these
+.env
+*.env
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+
+# VS Code
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Image uploads (local storage)
+uploads/
+
+# Spring Boot
+spring-shell.log
