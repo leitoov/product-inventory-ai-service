@@ -9,10 +9,9 @@ import com.inventory.domain.model.SalesSession;
 import com.inventory.domain.port.out.ProductRepositoryPort;
 import com.inventory.domain.port.out.QuoteGeneratorPort;
 import com.inventory.domain.port.out.SalesAgentPort;
+import com.inventory.domain.port.out.SalesSessionRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.Cache;
-import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,12 +24,10 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class SalesAgentService {
 
-    private static final String SALES_SESSION_CACHE = "agentSessions"; // Podemos reusar o crear una nueva cache
-
     private final SalesAgentPort salesAgentPort;
     private final ProductRepositoryPort productRepository;
     private final QuoteGeneratorPort quoteGeneratorPort;
-    private final CacheManager cacheManager;
+    private final SalesSessionRepositoryPort sessionRepository;
     private final ObjectMapper objectMapper;
 
     @Transactional
@@ -88,10 +85,10 @@ public class SalesAgentService {
             pdfBase64 = Base64.getEncoder().encodeToString(pdfBytes);
 
             // Limpiar la sesión ya que terminó la compra
-            getCache().evict(session.getSessionId());
+            sessionRepository.deleteById(session.getSessionId());
         } else {
             // Guardar progreso
-            saveSession(session);
+            sessionRepository.save(session);
         }
 
         return new SalesAgentResponseDto(
@@ -105,23 +102,10 @@ public class SalesAgentService {
 
     private SalesSession resolveSession(String sessionId) {
         if (sessionId != null && !sessionId.isBlank()) {
-            Cache cache = getCache();
-            Cache.ValueWrapper wrapper = cache.get(sessionId);
-            if (wrapper != null && wrapper.get() instanceof SalesSession existing) {
-                return existing;
-            }
+            return sessionRepository.findById(sessionId)
+                    .orElseGet(() -> new SalesSession(sessionId));
         }
         return new SalesSession(UUID.randomUUID().toString());
-    }
-
-    private void saveSession(SalesSession session) {
-        getCache().put(session.getSessionId(), session);
-    }
-
-    private Cache getCache() {
-        Cache cache = cacheManager.getCache(SALES_SESSION_CACHE);
-        if (cache == null) throw new IllegalStateException("Cache '" + SALES_SESSION_CACHE + "' not configured.");
-        return cache;
     }
 
     record SimplifiedProduct(String sku, String name, java.math.BigDecimal price, Integer stock) {}
